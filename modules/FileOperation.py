@@ -29,3 +29,14 @@ def raw_to_tiff(path, filename):
     )
     tifffile.imwrite('{}.tiff'.format(filename),data = img)
 
+def read_exif(path, filename):
+    FIELD = 'EXIF DataTimeOriginal'
+    f = open(path + filename, 'rb')
+    #注意，exifread只支持jpg或者tiff格式的输入
+    tags = exifread.process_file(f)
+    f.close()
+    if FIELD in tags:
+        #获取照片的时间
+        time = str(tags[FIELD])
+        #获取照片的格式
+        file_suffix = os.path.splitext(filename)[-1]
