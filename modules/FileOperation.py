@@ -1,4 +1,5 @@
 import os
+import imageio
 import rawpy
 import tifffile
 import exifread
@@ -40,3 +41,12 @@ def read_exif(path, filename):
         time = str(tags[FIELD])
         #获取照片的格式
         file_suffix = os.path.splitext(filename)[-1]
+
+def extract_preview_image(path, filename):
+    raw = rawpy.imread(path + filename)
+    thumb = raw.extract_thumb()
+    if thumb.format == rawpy.ThumbFormat.JPGE:
+        f = open(path + filename, 'wb')
+        f.write(thumb.data)
+    else:
+        imageio.imsave(filename + '_thumb.jpeg,', thumb.data)
