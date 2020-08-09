@@ -1,4 +1,4 @@
-import modules.FileOperation
+import core.FileOperator
 
-print("Welcome to Archivist!")
-
+fileOperator = core.FileOperator.FileOperator()
+fileOperator.SearchAllFiles()
