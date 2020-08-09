@@ -20,19 +20,21 @@ def RawToTiff(path, filename):
     )
     tifffile.imwrite('{}.tiff'.format(filename), data=img)
 
-def read_exif(path, filename):
-    FIELD = 'EXIF DataTimeOriginal'
+def ReadExif(path, filename):
     f = open(path + filename, 'rb')
     #注意，exifread只支持jpg或者tiff格式的输入
     tags = exifread.process_file(f)
     f.close()
+    '''
     if FIELD in tags:
         #获取照片的时间
         time = str(tags[FIELD])
         #获取照片的格式
         file_suffix = os.path.splitext(filename)[-1]
+    '''
+    return tags
 
-def extract_preview_image(path, filename):
+def ExtractPreviewImage(path, filename):
     raw = rawpy.imread(path + filename)
     thumb = raw.extract_thumb()
     if thumb.format == rawpy.ThumbFormat.JPGE:
