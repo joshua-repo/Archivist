@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import json
 import tools.Utilities
 
 '''
@@ -14,48 +15,47 @@ class FileOperator(object):
     def __init__(self):
         print("Welcome to Archivisit!")
 
-        conn = sqlite3.connect("backups/Archives.db")
-        cur = conn.cursor()
+        self.conn = sqlite3.connect("backups/Archives.db")
+        self.cur = self.conn.cursor()
         '''
         初始化用于管理图片的表
         key-路径
         value-EXIF信息，自定义名称，tags(用户自定）
         EXIF信息是一个字典，存入数据库之前需要序列化
         '''
-        cur.execute('''CREATE TABLE IF NOT EXISTS PICTURES (
+        self.cur.execute('''CREATE TABLE IF NOT EXISTS PICTURES (
         PATH    TEXT    PRIMARY KEY NOT NULL ,
+        FILENAME    TEXT    NOT NULL ,
         EXIF    TEXT    NOT NULL ,
         TAGS    TEXT    NOT NULL);''')
-#        print("Picture Library initialized successfully.")
+        print("Picture Library initialized successfully.")
         '''
         初始化用于管理音乐的表
         key-路径
         '''
-        cur.execute('''CREATE TABLE IF NOT EXISTS MUSIC(
+        self.cur.execute('''CREATE TABLE IF NOT EXISTS MUSIC(
         PATH    TEXT PRIMARY KEY NOT NULL ,
         INFO    TEXT    NOT NULL ,
         ALMBU   TEXT    NOT NULL ,
         TAGS    TEXT    NOT NULL );''')
-#        print("Music Library initialized successfully.")
+        print("Music Library initialized successfully.")
         '''
         初始化用于管理文档的表
         key-路径
         '''
-        cur.execute('''CREATE TABLE IF NOT EXISTS DOC(
+        self.cur.execute('''CREATE TABLE IF NOT EXISTS DOC(
         PATH    TEXT    PRIMARY KEY NOT NULL 
         );''')
-#        print("Document Library initialized successfully.")
+        print("Document Library initialized successfully.")
 
-        conn.commit()
-        conn.close()
+        self.conn.commit()
+#        conn.close()
 
         self.suffixName = ['Anything']
         self.picFiles = ['JPGE', 'JPG', 'jpg', 'jpge', 'raw', 'tiff']
         self.musicFiles = ['MP3', 'mp3']
         self.docFiles = ['pdf', 'doc', 'docx']
         self.costumeFiles = []
-        self.conn = sqlite3.connect("backups/Archives.db")
-        self.cur = conn.cursor()
 
     def RedirectLibrary(self, libPath):
         self.libPath = libPath
@@ -71,9 +71,9 @@ class FileOperator(object):
             suffixName = os.path.splitext(fileName)[-1]
             if suffixName in self.picFiles:
                 print("Found Picture {}".format(fileName))
-                self.cur.execute('''(
-
-                );''')
+                EXIF = json.dump(tools.Utilities.RawToTiff(path, fileName))
+                sql = "INSERT INTO PICTURES (PATH ,FILENAME ,EXIF, TAGS) VALUES ({}, {}, {}, {})".format(path, EXIF, fileName, "NONE")
+                self.cur.execute(sql)
                 self.conn.commit()
             elif suffixName in self.musicFiles:
                 print("Found Music {}".format(fileName))
@@ -92,6 +92,10 @@ class FileOperator(object):
                 );''')
             if os.path.isdir(path + "\\" + fileName):
                 self.SearchSelectedPath(path + "\\" + fileName)
+
+    def SetTag(self, path, tag):
+        self.cur.execute('''(
+        );''')
 
     def __del__(self):
         self.conn.commit()
