@@ -1,12 +1,25 @@
 import sys
 from PyQt5.QtWidgets import QApplication
+import core.Controller
 import core.FileOperator
 import core.StartPage
+import core.MainPage
 
-if __name__ == '__main__':
+
+def main():
     app = QApplication(sys.argv)
-    startPage = core.StartPage.StartPage()
+    controller = core.Controller.Controller()
+#    controller.showStartPage()
+    if controller.isInitialized():
+        controller.showMainPage()
+    else:
+        controller.showStartPage()
     sys.exit(app.exec_())
 
-# fileOperator = core.FileOperator.FileOperator()
-# fileOperator.SearchSelectedPath('.\\tests')
+def fileOperatorTest():
+    fileOperator = core.FileOperator.FileOperator()
+    fileOperator.SearchSelectedPath('./tests')
+
+if __name__ == '__main__':
+    main()
+    #fileOperatorTest()
