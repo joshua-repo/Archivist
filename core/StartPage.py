@@ -1,27 +1,63 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMessageBox, QDesktopWidget
-from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QMenu
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMessageBox, QDesktopWidget, QGridLayout, QLineEdit
+from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QMenu, QLabel, QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QCoreApplication
 
 class StartPage(QWidget):
+
+    switch_window = QtCore.pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.initUI()
 
     def initUI(self):
-        exitBtm = QPushButton('Exit', self)
-        exitBtm.clicked.connect(QCoreApplication.instance().quit)
-        exitBtm.resize(exitBtm.sizeHint())
-        exitBtm.move(50,50)
+        exitButtom = QPushButton('Exit', self)
+        exitButtom.clicked.connect(QCoreApplication.instance().quit)
+        exitButtom.resize(exitButtom.sizeHint())
 
-        OKBtm = QPushButton('OK', self)
-        OKBtm.move(100, 100)
+        okButtom = QPushButton('OK', self)
+        okButtom.clicked.connect(self.toMainPage)
 
-        self.resize(700, 300)
+        pathButtom = QPushButton('...', self)
+
+        loginButtom = QPushButton('login', self)
+        registButtom = QPushButton('regist', self)
+
+        welLabel = QLabel('Welcoming to Archivist!')
+        impLabelLocal = QLabel('Import Library from a local path:')
+        impLabelLogin = QLabel('Set up Archivist via login.')
+        commentLabel = QLabel('W.I.P')
+
+        pathEdit = QLineEdit()
+        accountEdit = QLineEdit()
+        passwordEdit = QLineEdit()
+
+        grid = QGridLayout()
+        self.setLayout(grid)
+        grid.addWidget(welLabel, 0, 0)
+        grid.addWidget(impLabelLocal, 1, 0)
+        grid.addWidget(pathEdit, 2, 0)
+        grid.addWidget(pathButtom, 2, 1)
+        grid.addWidget(impLabelLogin, 3, 0)
+        grid.addWidget(commentLabel, 3, 1)
+        grid.addWidget(accountEdit, 4, 0)
+        grid.addWidget(passwordEdit, 5, 0)
+        grid.addWidget(loginButtom, 5, 1)
+        grid.addWidget(registButtom, 5, 2)
+        grid.addWidget(okButtom, 6, 5)
+        grid.addWidget(exitButtom, 6, 6)
+
+
+        self.resize(700, 200)
         self.center()
-        self.setWindowTitle('Set Up')
+        self.setWindowTitle('Set Up Archivist')
         self.setWindowIcon(QIcon('./core/icon.png'))
-        self.show()
+
+    def toMainPage(self):
+        self.switch_window.emit()
+        self.close()
 
     def center(self):
         qr = self.frameGeometry()
@@ -29,31 +65,10 @@ class StartPage(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-    def closeEvent(self, event):
-        reply = QMessageBox.question(self, 'Message', "Are you sure to quit?",
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            event.accept()
-        else:
-            event.ignore()
-
-# class StartPage():
-#     def __init__(self, object): #传入的是一个TK对象
-#         object.title('Archivist Set Up')
-#         object.geometry('500x200')
-#         tk.Label(object, text = 'Welcome to Archivist!').grid(row = 0, column = 2)
-#         tk.Label(object, text = 'Import Archivist Library from:').grid(row = 1, column = 0)
-#         tk.Label(object, text = 'Path:').grid(row = 2, column = 1)
-#         tk.Entry(object).grid(row = 2, column = 2)
-#         tk.Button(object, text = '...').grid(row = 2, column = 3)
-#         tk.Label(object, text = 'Initialize a new Library at:').grid(row = 3, column = 0)
-#         tk.Label(object, text='Path:').grid(row=4, column=1)
-#         tk.Entry(object).grid(row=4, column=2)
-#         tk.Button(object, text='...').grid(row=4, column=3)
-#         tk.Button(object, text = 'OK').grid(row = 5, column = 4)
-#         tk.Button(object, text = 'Exit').grid(row = 5, column = 5)
-#
-#
-#     def SelectPath(self):
-#         self.path_ = tk.askdirectory()
-#         self.libPath.set(self.path_)
+    # def closeEvent(self, event):
+    #     reply = QMessageBox.question(self, 'Message', "Are you sure to quit?",
+    #                                  QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+    #     if reply == QMessageBox.Yes:
+    #         event.accept()
+    #     else:
+    #         event.ignore()
