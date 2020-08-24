@@ -16,7 +16,7 @@ class FileOperator(object):
         print("Welcome to Archivisit!")
         print("Current working path {}".format(os.getcwd()))
         #生成当前工作路径，默认情况是软件所在位置
-        self.workingDir = os.getcwd()
+        #self.workingDir = os.getcwd()
 
         self.conn = sqlite3.connect("backups/Archives.db")
         self.cur = self.conn.cursor()
