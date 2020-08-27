@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QPushButton, QMessageBox, QDesktopWidget, QMainWindow, QMenu
+import os
+from PyQt5.QtWidgets import QWidget, QPushButton, QMessageBox, QDesktopWidget, QMainWindow, QMenu, QTabBar, QTabWidget
 from PyQt5.QtWidgets import QAction, qApp
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QCoreApplication
@@ -9,34 +10,72 @@ class MainPage(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.resize(1800, 950)
-        self.center()
-        self.setWindowTitle('Archivist')
-        self.setWindowIcon(QIcon('./core/icon.png'))
-
-        exitAct = QAction('&Exit',self)
-        exitAct.triggered.connect(qApp.quit)
-
         menubar = self.menuBar()
+
         fileMenu = menubar.addMenu('&File')
-        tagMenu = menubar.addMenu('&Tags')
-        netMenu = menubar.addMenu('&NetDisk')
-        exitMenu = menubar.addMenu('&Exit')
+        editMenu = menubar.addMenu('&Edit')
+        viewMenu = menubar.addMenu('&View')
+        tagsMenu = menubar.addMenu('&Tags')
 
-        importLib = QAction('Import the library', self)
-        exportLib = QAction('Export the library', self)
-
+        #fileMenu
         addLibMenu = QMenu('Add a new path to library', self)
         addLocal = QAction('Local Path', self)
         addURL = QAction('From URL', self)
+        addDisk = QAction('Whole Disk', self)
         addLibMenu.addAction(addLocal)
         addLibMenu.addAction(addURL)
+        addLibMenu.addAction(addDisk)
+
+        importLib = QAction('Import the library', self)
+        exportLib = QAction('Export the library', self)
 
         fileMenu.addMenu(addLibMenu)
         fileMenu.addAction(importLib)
         fileMenu.addAction(exportLib)
 
-        exitMenu.addAction(exitAct)
+        #editMenu
+        addFileType = QAction('Add a new file type', self)
+
+        editMenu.addAction(addFileType)
+
+        #viewMenu
+        iconSizeMenu = QMenu('Icon size', self)
+        smallSize = QAction('Small size', self)
+        middleSize = QAction('Middle size', self)
+        largeSize = QAction('Large size', self)
+        iconSizeMenu.addAction(smallSize)
+        iconSizeMenu.addAction(middleSize)
+        iconSizeMenu.addAction(largeSize)
+
+        sortMenu = QMenu('Sort by', self)
+        nameOrder = QAction('Name', self)
+        sizeOrder = QAction('Size', self)
+        typeOrder = QAction('Type', self)
+        dataOrder = QAction('Data', self)
+        tagsOrder = QAction('Tags', self)
+        sortMenu.addAction(nameOrder)
+        sortMenu.addAction(sizeOrder)
+        sortMenu.addAction(typeOrder)
+        sortMenu.addAction(dataOrder)
+        sortMenu.addAction(tagsOrder)
+
+        viewMenu.addMenu(iconSizeMenu)
+        viewMenu.addMenu(sortMenu)
+
+        #tagsMenu
+        addTags = QAction('New Label', self)
+        addRating = QAction('New Rating', self)
+
+        tagsMenu.addAction(addTags)
+        tagsMenu.addAction(addRating)
+
+        self.tabWidget = QTabWidget()
+        self.tabWidget.setMovable(True)
+
+        self.resize(1800, 950)
+        self.center()
+        self.setWindowTitle('Archivist')
+        self.setWindowIcon(QIcon('./core/icon.png'))
 
     def center(self):
         qr = self.frameGeometry()
