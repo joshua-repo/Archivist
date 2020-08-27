@@ -1,4 +1,5 @@
 import sys
+#import qdarkstyle
 from PyQt5.QtWidgets import QApplication
 import core.Controller
 import core.FileOperator
@@ -8,8 +9,8 @@ import core.MainPage
 
 def main():
     app = QApplication(sys.argv)
+    #app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     controller = core.Controller.Controller()
-#    controller.showStartPage()
     if controller.isInitialized():
         controller.showMainPage()
     else:
