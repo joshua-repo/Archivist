@@ -1,5 +1,6 @@
+import os
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMessageBox, QDesktopWidget, QGridLayout, QLineEdit
+from PyQt5.QtWidgets import QWidget, QPushButton, QMessageBox, QDesktopWidget, QGridLayout, QLineEdit, QFileDialog
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QMenu, QLabel, QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QCoreApplication
@@ -21,6 +22,7 @@ class StartPage(QWidget):
         okButtom.clicked.connect(self.toMainPage)
 
         pathButtom = QPushButton('...', self)
+        pathButtom.clicked.connect(self.openPath)
 
         loginButtom = QPushButton('login', self)
         registButtom = QPushButton('regist', self)
@@ -30,7 +32,7 @@ class StartPage(QWidget):
         impLabelLogin = QLabel('Set up Archivist via login.')
         commentLabel = QLabel('W.I.P')
 
-        pathEdit = QLineEdit()
+        self.pathEdit = QLineEdit()
         accountEdit = QLineEdit()
         passwordEdit = QLineEdit()
 
@@ -38,7 +40,7 @@ class StartPage(QWidget):
         self.setLayout(grid)
         grid.addWidget(welLabel, 0, 0)
         grid.addWidget(impLabelLocal, 1, 0)
-        grid.addWidget(pathEdit, 2, 0)
+        grid.addWidget(self.pathEdit, 2, 0)
         grid.addWidget(pathButtom, 2, 1)
         grid.addWidget(impLabelLogin, 3, 0)
         grid.addWidget(commentLabel, 3, 1)
@@ -49,13 +51,22 @@ class StartPage(QWidget):
         grid.addWidget(okButtom, 6, 5)
         grid.addWidget(exitButtom, 6, 6)
 
-
         self.resize(700, 200)
         self.center()
         self.setWindowTitle('Set Up Archivist')
         self.setWindowIcon(QIcon('./core/icon.png'))
 
+    def openPath(self):
+        fileName, fileType = QFileDialog.getOpenFileName(self, 'Select the Library', '/', 'Archives(Archives.db)')
+        #TODO 是不是要设计成只能命名为Archives.db呢？如果是那么又要怎么设计版本兼容？
+        if os.path.split(fileName)[-1] != 'Archives.db':
+            print(os.path.split(fileName)[-1])
+            QMessageBox.information(self, 'Error','Please choose the Archives.db')
+        else:
+            self.pathEdit.setText(fileName)
+
     def toMainPage(self):
+        #TODO 还没有写上把第一个Page的路径传给MainPage的内容
         self.switch_window.emit()
         self.close()
 
