@@ -1,5 +1,4 @@
 import os
-import imageio
 import rawpy
 import tifffile
 import exifread
@@ -13,8 +12,6 @@ def ReadExif(path, filename):
     tags = exifread.process_file(f)
     f.close()
     return tags
-
-
 
 #这个模块还没有验证,也许有更好的办法
 #这里使用绝对路径，path这个参数直接传入os.getcwd()
