@@ -7,19 +7,21 @@ import tools.Utilities
 使用SQLite作为Archivist的数据库
 在初始化过程中应先检查这个数据库
 Archives.db为总数据库
-图片、音乐、视频、文档（未来计划）
+图片、pdf（阅读管理）、音乐、视频、文档（未来计划）
 '''
 
 class FileOperator(object):
 
     def __init__(self):
-        print("Welcome to Archivisit!")
-        print("Current working path {}".format(os.getcwd()))
-        #生成当前工作路径，默认情况是软件所在位置
-        #self.workingDir = os.getcwd()
-
         self.conn = sqlite3.connect("backups/Archives.db")
         self.cur = self.conn.cursor()
+        '''
+        初始化数据库自身的元数据
+        '''
+        self.cur.execute('''CREATE TABLE IF NOT EXISTS METADATE(
+        VERSION     TEXT    PRIMARY KEY NOT NULL ,
+        HOSTEDPATH  TEXT    NOT NULL );''')
+
         '''
         初始化用于管理图片的表
         key-路径
@@ -32,7 +34,7 @@ class FileOperator(object):
         EXIF        TEXT    NOT NULL ,
         THUMBNAIL   TEXT    NOT NULL ,
         USERTAGS    TEXT    NOT NULL);''')
-        print("Picture Library initialized successfully.")
+
         '''
         初始化用于管理音乐的表
         key-路径
@@ -42,7 +44,7 @@ class FileOperator(object):
         INFO        TEXT    NOT NULL ,
         ALMBU       TEXT    NOT NULL ,
         USERTAGS    TEXT    NOT NULL );''')
-        print("Music Library initialized successfully.")
+
         '''
         初始化用于管理文档的表
         key-路径
@@ -50,7 +52,6 @@ class FileOperator(object):
         self.cur.execute('''CREATE TABLE IF NOT EXISTS DOC(
         PATH    TEXT    PRIMARY KEY NOT NULL 
         );''')
-        print("Document Library initialized successfully.")
 
         self.conn.commit()
 
@@ -91,11 +92,6 @@ class FileOperator(object):
                 print("Found costume type file {}".format(fileName))
             if os.path.isdir(path + '/' + fileName):
                 self.SearchSelectedPath(path + '/' + fileName)
-
-
-    # def SetTag(self, path, tag):
-    #     self.cur.execute('''(
-    #     );''')
 
     def __del__(self):
         self.conn.commit()
