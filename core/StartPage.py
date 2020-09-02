@@ -7,7 +7,7 @@ from PyQt5.QtCore import QCoreApplication
 
 class StartPage(QWidget):
 
-    switch_window = QtCore.pyqtSignal()
+    switchWindow = QtCore.pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -33,8 +33,8 @@ class StartPage(QWidget):
         commentLabel = QLabel('W.I.P')
 
         self.pathEdit = QLineEdit()
-        accountEdit = QLineEdit()
-        passwordEdit = QLineEdit()
+        self.accountEdit = QLineEdit()
+        self.passwordEdit = QLineEdit()
 
         grid = QGridLayout()
         self.setLayout(grid)
@@ -44,8 +44,8 @@ class StartPage(QWidget):
         grid.addWidget(pathButtom, 2, 1)
         grid.addWidget(impLabelLogin, 3, 0)
         grid.addWidget(commentLabel, 3, 1)
-        grid.addWidget(accountEdit, 4, 0)
-        grid.addWidget(passwordEdit, 5, 0)
+        grid.addWidget(self.accountEdit, 4, 0)
+        grid.addWidget(self.passwordEdit, 5, 0)
         grid.addWidget(loginButtom, 5, 1)
         grid.addWidget(registButtom, 5, 2)
         grid.addWidget(okButtom, 6, 5)
@@ -58,28 +58,24 @@ class StartPage(QWidget):
 
     def openPath(self):
         fileName, fileType = QFileDialog.getOpenFileName(self, 'Select the Library', '/', 'Archives(Archives.db)')
-        #TODO 是不是要设计成只能命名为Archives.db呢？如果是那么又要怎么设计版本兼容？
+        #是不是要设计成只能命名为Archives.db呢？如果是那么又要怎么设计版本兼容？
         if os.path.split(fileName)[-1] != 'Archives.db':
-            print(os.path.split(fileName)[-1])
             QMessageBox.information(self, 'Error','Please choose the Archives.db')
         else:
             self.pathEdit.setText(fileName)
 
     def toMainPage(self):
-        #TODO 还没有写上把第一个Page的路径传给MainPage的内容
-        self.switch_window.emit()
-        self.close()
+        if self.pathEdit.text() == "":
+            self.libPath = ""
+            self.switchWindow.emit(self.libPath)
+            self.close()
+        else:
+            self.libPath = self.pathEdit.text()
+            self.switchWindow.emit(self.libPath)
+            self.close()
 
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-
-    # def closeEvent(self, event):
-    #     reply = QMessageBox.question(self, 'Message', "Are you sure to quit?",
-    #                                  QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-    #     if reply == QMessageBox.Yes:
-    #         event.accept()
-    #     else:
-    #         event.ignore()
