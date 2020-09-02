@@ -1,5 +1,7 @@
 import os
-from PyQt5.QtWidgets import QWidget, QPushButton, QMessageBox, QDesktopWidget, QMainWindow, QMenu, QTabBar, QTabWidget
+from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+import tools.Utilities
+from PyQt5.QtWidgets import QWidget, QPushButton, QMessageBox, QDesktopWidget, QMainWindow, QMenu, QTabBar, QTabWidget, QFileDialog
 from PyQt5.QtWidgets import QAction, qApp
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QCoreApplication
@@ -20,7 +22,8 @@ class MainPage(QMainWindow):
         #fileMenu
         addLibMenu = QMenu('Add a new path to library', self)
         addLocal = QAction('Local Path', self)
-        addURL = QAction('From URL', self)
+        addLocal.triggered.connect(self.addLocalPath)
+        addURL = QAction('From Internet', self)
         addDisk = QAction('Whole Disk', self)
         addLibMenu.addAction(addLocal)
         addLibMenu.addAction(addURL)
@@ -76,6 +79,53 @@ class MainPage(QMainWindow):
         self.center()
         self.setWindowTitle('Archivist')
         self.setWindowIcon(QIcon('./core/icon.png'))
+
+    def addLocalPath(self):
+        self.localPath = QFileDialog.getExistingDirectory(self, 'Select the directory', '/')
+        db = QSqlDatabase.addDatabase('QSQLITE')
+        db.setDatabaseName('./backups/Archivies.db')
+        db.open()
+        query = QSqlQuery()
+        query.exec()
+
+    def createDB(self):
+        db = QSqlDatabase.addDatabase('QSQLITE')
+        db.setDatabaseName('./backups/Archivies.db')
+        db.open()
+        query = QSqlQuery()
+        query.exec('''CREATE TABLE IF NOT EXISTS METADATE(
+                VERSION     TEXT    PRIMARY KEY NOT NULL ,
+                LOCATIONS   TEXT    NOT NULL 
+            );''')
+
+        query.exec('''CREATE TABLE IF NOT EXISTS PICTURES(
+                PATH        TEXT    PRIMARY KEY NOT NULL ,
+                FILENAME    TEXT    NOT NULL ,
+                EXIF        TEXT    NOT NULL ,
+                USERTAGS    TEXT    NOT NULL
+            );''')
+
+        query.exec('''CREATE TABLE IF NOT EXISTS PDFDOC(
+                PATH        TEXT    PRIMARY KEY ,
+                FILENAME    TEXT    NOT NULL ,
+                ARRAGE      TEXT    NOT NULL ,
+                USERTAGS    TEXT    NOT NULL 
+            );''')
+
+        query.exec('''CREATE TABLE IF NOT EXISTS MUSIC(
+                PATH        TEXT    PRIMARY KEY ,
+                FILENAME    TEXT    NOT NULL ,
+                METADATA    TEXT    NOT NULL ,
+                THUMBNAIL   TEXT    NOT NULL ,
+                ALBUM       TEXT    NOT NULL ,
+                USERTAGS    TEXT    NOT NULL ,
+                STYLE       TEXT    NOT NULL 
+            );''')
+        db.close()
+
+    def readDB(self):
+        #TODO 用导入的数据库直接替换现有的Archivies.db
+        pass
 
     def center(self):
         qr = self.frameGeometry()
