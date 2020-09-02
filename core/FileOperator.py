@@ -13,6 +13,9 @@ Archives.db为总数据库
 class FileOperator(object):
 
     def __init__(self):
+        print("FileOperator is at your services.")
+
+    def createDB(self):
         self.conn = sqlite3.connect("backups/Archives.db")
         self.cur = self.conn.cursor()
         '''
@@ -21,7 +24,6 @@ class FileOperator(object):
         self.cur.execute('''CREATE TABLE IF NOT EXISTS METADATE(
         VERSION     TEXT    PRIMARY KEY NOT NULL ,
         HOSTEDPATH  TEXT    NOT NULL );''')
-
         '''
         初始化用于管理图片的表
         key-路径
@@ -94,6 +96,4 @@ class FileOperator(object):
                 self.SearchSelectedPath(path + '/' + fileName)
 
     def __del__(self):
-        self.conn.commit()
-        self.conn.close()
-        print("Exit Archivist successfully.")
+        print("FileOperator is dead.")
