@@ -1,10 +1,10 @@
 # Archivist
 
-FOCUSE ON YOUR VALUEABLE DIGITAL ASSETS.
+#### FOCUSE ON YOUR VALUEABLE DIGITAL ASSETS.
 
 Archivist is an easy tool to help access all your digital assets.
 
-(This is still W.I.P)
+(This project is still W.I.P)
 
 ## 1.Background
 For most of people, what they really need is to deal with their
@@ -34,5 +34,14 @@ then just run Archivist.py directly
 python Archivist.py
 ```
 
+## 5.TODO
+- [x] Database initialization
+- [ ] Mainpage UI
+    - [ ] Location Zone
+    - [ ] Filter Zone
+    - [ ] Main Zone
+    - [ ] Preview Zone
+    - [ ] Metadata Zone
+- [ ] Network storage(Too Far)
 
 
