@@ -14,42 +14,41 @@ class StartPage(QWidget):
         self.initUI()
 
     def initUI(self):
-        exitButtom = QPushButton('Exit', self)
-        exitButtom.clicked.connect(QCoreApplication.instance().quit)
-        exitButtom.resize(exitButtom.sizeHint())
+        self.exitButtom = QPushButton('Exit', self)
+        self.exitButtom.clicked.connect(QCoreApplication.instance().quit)
 
-        okButtom = QPushButton('OK', self)
-        okButtom.clicked.connect(self.toMainPage)
+        self.okButtom = QPushButton('OK', self)
+        self.okButtom.clicked.connect(self.toMainPage)
 
-        pathButtom = QPushButton('...', self)
-        pathButtom.clicked.connect(self.openPath)
+        self.pathButtom = QPushButton('...', self)
+        self.pathButtom.clicked.connect(self.openPath)
 
-        loginButtom = QPushButton('login', self)
-        registButtom = QPushButton('regist', self)
+        self.loginButtom = QPushButton('login', self)
+        self.registButtom = QPushButton('regist', self)
 
-        welLabel = QLabel('Welcoming to Archivist!')
-        impLabelLocal = QLabel('Import Library from a local path:')
-        impLabelLogin = QLabel('Set up Archivist via login.')
-        commentLabel = QLabel('W.I.P')
+        self.welLabel = QLabel('Welcoming to Archivist!')
+        self.impLabelLocal = QLabel('Import Library from a local path:')
+        self.impLabelLogin = QLabel('Set up Archivist via login.')
+        self.commentLabel = QLabel('W.I.P')
 
         self.pathEdit = QLineEdit()
         self.accountEdit = QLineEdit()
         self.passwordEdit = QLineEdit()
 
-        grid = QGridLayout()
-        self.setLayout(grid)
-        grid.addWidget(welLabel, 0, 0)
-        grid.addWidget(impLabelLocal, 1, 0)
-        grid.addWidget(self.pathEdit, 2, 0)
-        grid.addWidget(pathButtom, 2, 1)
-        grid.addWidget(impLabelLogin, 3, 0)
-        grid.addWidget(commentLabel, 3, 1)
-        grid.addWidget(self.accountEdit, 4, 0)
-        grid.addWidget(self.passwordEdit, 5, 0)
-        grid.addWidget(loginButtom, 5, 1)
-        grid.addWidget(registButtom, 5, 2)
-        grid.addWidget(okButtom, 6, 5)
-        grid.addWidget(exitButtom, 6, 6)
+        self.grid = QGridLayout()
+        self.setLayout(self.grid)
+        self.grid.addWidget(self.welLabel, 0, 0)
+        self.grid.addWidget(self.impLabelLocal, 1, 0)
+        self.grid.addWidget(self.pathEdit, 2, 0)
+        self.grid.addWidget(self.pathButtom, 2, 1)
+        self.grid.addWidget(self.impLabelLogin, 3, 0)
+        self.grid.addWidget(self.commentLabel, 3, 1)
+        self.grid.addWidget(self.accountEdit, 4, 0)
+        self.grid.addWidget(self.passwordEdit, 5, 0)
+        self.grid.addWidget(self.loginButtom, 5, 1)
+        self.grid.addWidget(self.registButtom, 5, 2)
+        self.grid.addWidget(self.okButtom, 6, 5)
+        self.grid.addWidget(self.exitButtom, 6, 6)
 
         self.resize(700, 200)
         self.center()
@@ -58,7 +57,6 @@ class StartPage(QWidget):
 
     def openPath(self):
         fileName, fileType = QFileDialog.getOpenFileName(self, 'Select the Library', '/', 'Archives(Archives.db)')
-        #是不是要设计成只能命名为Archives.db呢？如果是那么又要怎么设计版本兼容？
         if os.path.split(fileName)[-1] != 'Archives.db':
             QMessageBox.information(self, 'Error','Please choose the Archives.db')
         else:
