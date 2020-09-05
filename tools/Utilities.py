@@ -1,4 +1,6 @@
 import os
+import http.client
+import time
 import sqlite3
 import rawpy
 import tifffile
@@ -7,10 +9,9 @@ import taglib #支持任意类型的文件标记
 import tinytag #目前作用是提取音乐的专辑封面
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 
-#这个模块已经使用
+# 可以直接读NEF格式
 def ReadExif(path, filename):
     f = open(path+ "\\" + filename, 'rb')
-    #可以直接读NEF格式
     tags = exifread.process_file(f)
     f.close()
     return tags
@@ -32,61 +33,20 @@ def SearchSelectedPath(path,picFiles = [], musicFiles = [], docFiles = []):
         if os.path.isdir(path + '/' + fileName):
             SearchSelectedPath(path + '/' + fileName)
 
-# def crateDB():
-#     db = QSqlDatabase.addDatabase('QSQLITE')
-#     db.setDatabaseName('./backups/Archivies.db')
-#     with db.open():
-#         return False
-#     query = QSqlQuery()
-#     query.exec('''CREATE TABLE IF NOT EXISTS METADATE(
-#         VERSION     TEXT    PRIMARY KEY NOT NULL ,
-#         HOSTEDIR    TEXT    NULT
-#     );''')
-#
-#     query.exec('''CREATE TABLE IF NOT EXISTS PICTURES(
-#         PATH        TEXT    PRIMARY KEY NOT NULL ,
-#         FILENAME    TEXT    NOT NULL ,
-#         EXIF        TEXT    NOT NULL ,
-#         USERTAGS    TEXT    NOT NULL
-#     );''')
-#
-#     query.exec('''CREATE TABLE IF NOT EXISTS PDFDOC(
-#         PATH        TEXT    PRIMARY KEY ,
-#         FILENAME    TEXT    NOT NULL ,
-#         ARRAGE      TEXT    NOT NULL ,
-#         USERTAGS    TEXT    NOT NULL ,
-#     );''')
-#
-#     query.exec('''CREATE TABLE IF NOT EXISTS MUSIC(
-#         PATH        TEXT    PRIMARY KEY ,
-#         FILENAME    TEXT    NOT NULL ,
-#         METADATA    TEXT    NOT NULL ,
-#         THUMBNAIL   TEXT    NOT NULL ,
-#         ALBUM       TEXT    NOT NULL ,
-#         USERTAGS    TEXT    NOT NULL ,
-#         STYLE       TEXT    NOT NULL
-#     );''')
-#     conn.close()
+#传入一个网址，来获得它的服务器时间
+def getWebServerTime(host):
+    conn = http.client.HTTPConnection(host)
+    conn.request("GET", "/")
+    r = conn.getresponse()
+    ts = r.getheader('date')
 
-
-#     self.cur.execute('''CREATE TABLE IF NOT EXISTS MUSIC(
-#     PATH        TEXT PRIMARY KEY NOT NULL ,
-#     INFO        TEXT    NOT NULL ,
-#     ALMBU       TEXT    NOT NULL ,
-#     USERTAGS    TEXT    NOT NULL );''')
-#
-#     self.cur.execute('''CREATE TABLE IF NOT EXISTS DOC(
-#     PATH    TEXT    PRIMARY KEY NOT NULL
-#     );''')
-#
-#     self.conn.commit()
-#
-#     self.picFiles = ['.JPGE', '.JPG', '.jpg', '.jpge', '.raw', '.tiff', '.NEF']
-#     self.musicFiles = ['.MP3', '.mp3']
-#     self.docFiles = ['.pdf', '.doc', '.docx']
-#     self.costumeFiles = []
-
-
+    # 将GMT时间转换成北京时间
+    # 以下这部分可能会用到
+    ltime = time.strptime(ts[5:25], "%d %b %Y %H:%M:%S")
+    ttime = time.localtime(time.mktime(ltime) + 8 * 60 * 60)
+    dat = "%u-%02u-%02u" % (ttime.tm_year, ttime.tm_mon, ttime.tm_mday)
+    tm = "%02u:%02u:%02u" % (ttime.tm_hour, ttime.tm_min, ttime.tm_sec)
+    return tm
 
 #这个模块还没有验证,也许有更好的办法
 #这里使用绝对路径，path这个参数直接传入os.getcwd()
