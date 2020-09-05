@@ -1,17 +1,28 @@
 import os
+import sqlite3
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
-import tools.Utilities
-from PyQt5.QtWidgets import QWidget, QPushButton, QMessageBox, QDesktopWidget, QMainWindow, QMenu, QTabBar, QTabWidget, QFileDialog
-from PyQt5.QtWidgets import QAction, qApp
+from PyQt5.QtWidgets import QWidget, QPushButton, QMessageBox, QDesktopWidget, QMainWindow, QMenu, QTabBar, QTabWidget, \
+    QFileDialog, QGridLayout, QSplitter, QHBoxLayout, QFrame, QAction, QGroupBox, QVBoxLayout, QTableView
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtCore import Qt
+from PyQt5 import QtWidgets
 
 class MainPage(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.localPath = QFileDialog.getExistingDirectory(self, 'Select the directory', '/')
         self.initUI()
 
     def initUI(self):
+        self.menuBarInit()
+        self.centralWidgetGridLayout()
+
+        self.resize(1800, 950)
+        self.center()
+        self.setWindowTitle('Archivist')
+        self.setWindowIcon(QIcon('./core/icon.png'))
+
+    def menuBarInit(self):
         menubar = self.menuBar()
 
         fileMenu = menubar.addMenu('&File')
@@ -72,59 +83,63 @@ class MainPage(QMainWindow):
         tagsMenu.addAction(addTags)
         tagsMenu.addAction(addRating)
 
-        self.tabWidget = QTabWidget()
-        self.tabWidget.setMovable(True)
+    def centralWidgetGridLayout(self):
+        self.testBottom1 = QPushButton('test1', self)
+        self.testBottom2 = QPushButton('test2', self)
 
-        self.resize(1800, 950)
-        self.center()
-        self.setWindowTitle('Archivist')
-        self.setWindowIcon(QIcon('./core/icon.png'))
+        self.grid = QGridLayout()
+        self.grid.addWidget(self.testBottom1, 0, 0)
+        self.grid.addWidget(self.testBottom2, 0, 1)
+
+        self.layoutWidget = QWidget()
+        self.layoutWidget.setLayout(self.grid)
+        self.setCentralWidget(self.layoutWidget)
+
 
     def addLocalPath(self):
-        self.localPath = QFileDialog.getExistingDirectory(self, 'Select the directory', '/')
         db = QSqlDatabase.addDatabase('QSQLITE')
-        db.setDatabaseName('./backups/Archivies.db')
+        db.setDatabaseName('./backups/Archives.db')
         db.open()
         query = QSqlQuery()
-        query.exec()
+        query.exec("INSERT INTO LIBINFO (LOCATIONS) values ('{}')".format(self.localPath))
+        db.close()
 
     def createDB(self):
         db = QSqlDatabase.addDatabase('QSQLITE')
-        db.setDatabaseName('./backups/Archivies.db')
+        db.setDatabaseName('./backups/Archives.db')
         db.open()
         query = QSqlQuery()
-        query.exec('''CREATE TABLE IF NOT EXISTS METADATE(
-                VERSION     TEXT    PRIMARY KEY NOT NULL ,
-                LOCATIONS   TEXT    NOT NULL 
+        query.exec('''CREATE TABLE IF NOT EXISTS LIBINFO(
+                LOCATIONS   TEXT    NOT NULL    UNIQUE 
             );''')
 
         query.exec('''CREATE TABLE IF NOT EXISTS PICTURES(
-                PATH        TEXT    PRIMARY KEY NOT NULL ,
+                PATH        TEXT    PRIMARY KEY NOT NULL UNIQUE ,
                 FILENAME    TEXT    NOT NULL ,
                 EXIF        TEXT    NOT NULL ,
                 USERTAGS    TEXT    NOT NULL
             );''')
 
         query.exec('''CREATE TABLE IF NOT EXISTS PDFDOC(
-                PATH        TEXT    PRIMARY KEY ,
+                PATH        TEXT    PRIMARY KEY UNIQUE ,
                 FILENAME    TEXT    NOT NULL ,
                 ARRAGE      TEXT    NOT NULL ,
-                USERTAGS    TEXT    NOT NULL 
+                USERTAGS    TEXT    NOT NULL
             );''')
 
         query.exec('''CREATE TABLE IF NOT EXISTS MUSIC(
-                PATH        TEXT    PRIMARY KEY ,
+                PATH        TEXT    PRIMARY KEY UNIQUE ,
                 FILENAME    TEXT    NOT NULL ,
                 METADATA    TEXT    NOT NULL ,
                 THUMBNAIL   TEXT    NOT NULL ,
                 ALBUM       TEXT    NOT NULL ,
                 USERTAGS    TEXT    NOT NULL ,
-                STYLE       TEXT    NOT NULL 
+                STYLE       TEXT    NOT NULL
             );''')
         db.close()
 
     def readDB(self):
-        #TODO 用导入的数据库直接替换现有的Archivies.db
+        #当用户需要从外部导入Archives.db时调用
         pass
 
     def center(self):
