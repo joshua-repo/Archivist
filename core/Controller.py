@@ -36,15 +36,19 @@ class Controller():
     #     self.mainPage.show()
 
     def showMainPage(self, *args): #Python的多态是这么实现的
-        if args[0] == "": #此时传入的路径是空的，初始化数据库
-            self.mainPage = core.MainPage.MainPage()
-            self.mainPage.createDB()
-            self.mainPage.show()
+        # 此时传入tuple为空，这是Archives.db被初始化后的情况
+        # 此时传入的tuple为非空，它有一个为空的元素,这是没有选取任何路径的情况
+        # 首先判断是否为空，若不为空则说明可能含有一个为空的元素
+        # 若为空，则为初始化之后的情况
+        if args:
+            if args[0] == "":
+                self.mainPage = core.MainPage.MainPage()
+                self.mainPage.createDB()
+                self.mainPage.show()
         else:
             self.mainPage = core.MainPage.MainPage()
             self.mainPage.readDB()
             self.mainPage.show()
-
 
     def __del__(self):
         print("Controller is dead.")
