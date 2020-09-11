@@ -12,67 +12,6 @@ Archives.db为总数据库
 
 class FileOperator(object):
 
-    def __init__(self):
-        print("FileOperator is at your services.")
-
-    def createDB(self):
-        self.conn = sqlite3.connect("backups/Archives.db")
-        self.cur = self.conn.cursor()
-        '''
-        初始化数据库自身的元数据
-        '''
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS METADATE(
-        VERSION     TEXT    PRIMARY KEY NOT NULL ,
-        HOSTEDPATH  TEXT    NOT NULL );''')
-        '''
-        初始化用于管理图片的表
-        key-路径
-        value-EXIF信息，自定义名称，tags(用户自定）
-        EXIF信息是一个字典，存入数据库之前需要序列化
-        '''
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS PICTURES (
-        PATH        TEXT    PRIMARY KEY NOT NULL ,
-        FILENAME    TEXT    NOT NULL ,
-        EXIF        TEXT    NOT NULL ,
-        THUMBNAIL   TEXT    NOT NULL ,
-        USERTAGS    TEXT    NOT NULL);''')
-
-        '''
-        初始化用于管理音乐的表
-        key-路径
-        '''
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS MUSIC(
-        PATH        TEXT PRIMARY KEY NOT NULL ,
-        INFO        TEXT    NOT NULL ,
-        ALMBU       TEXT    NOT NULL ,
-        USERTAGS    TEXT    NOT NULL );''')
-
-        '''
-        初始化用于管理文档的表
-        key-路径
-        '''
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS DOC(
-        PATH    TEXT    PRIMARY KEY NOT NULL 
-        );''')
-
-        self.conn.commit()
-
-        self.picFiles = ['.JPGE', '.JPG', '.jpg', '.jpge', '.raw', '.tiff', '.NEF']
-        self.musicFiles = ['.MP3', '.mp3']
-        self.docFiles = ['.pdf', '.doc', '.docx']
-        self.costumeFiles = []
-
-    #重新定位Archivies数据库,同时生成备份
-    # def RedirectLibrary(self, libPath):
-    #     self.libPath = libPath
-
-    #增加管理自定义类型文件
-    def costumeSearch(self):
-        print("What kind of files do you wish Archivist to manage?")
-        costumeSuffix = input()
-        self.costumeFiles.append(costumeSuffix)
-        print("Now Archivist will serach files including {}.".format(self.costumeFiles))
-
     #搜索目标路径的所有文件
     def SearchSelectedPath(self, path):
         for fileName in os.listdir(path):
@@ -94,6 +33,3 @@ class FileOperator(object):
                 print("Found costume type file {}".format(fileName))
             if os.path.isdir(path + '/' + fileName):
                 self.SearchSelectedPath(path + '/' + fileName)
-
-    def __del__(self):
-        print("FileOperator is dead.")
