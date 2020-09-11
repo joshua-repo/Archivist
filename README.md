@@ -27,7 +27,7 @@ pip install -r requirements.txt
 ## 4. Usage
 - Clone the repository
 ```shell script
-git clone 
+git clone https://github.com/Oderschvank/Archivist.git
 ```
 then just run Archivist.py directly
 ```shell script
@@ -36,12 +36,8 @@ python Archivist.py
 
 ## 5.TODO
 - [x] Database initialization
-- [ ] Mainpage UI
-    - [ ] Location Zone
-    - [ ] Filter Zone
-    - [ ] Main Zone
-    - [ ] Preview Zone
-    - [ ] Metadata Zone
-- [ ] Network storage(Too Far)
+- [x] Mainpage UI
+- [ ] Database
+- [ ] Network storage
 
 
