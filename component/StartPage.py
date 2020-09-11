@@ -53,7 +53,7 @@ class StartPage(QWidget):
         self.resize(700, 200)
         self.center()
         self.setWindowTitle('Set Up Archivist')
-        self.setWindowIcon(QIcon('./core/icon.png'))
+        self.setWindowIcon(QIcon('./resource/icon.png'))
 
     def openPath(self):
         fileName, fileType = QFileDialog.getOpenFileName(self, 'Select the Library', '/', 'Archives(Archives.db)')
