@@ -1,9 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication
 import core.Controller
-import core.FileOperator
-import core.StartPage
-import core.MainPage
 
 
 def main():
