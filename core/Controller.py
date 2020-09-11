@@ -1,14 +1,11 @@
 import os
-import sys
-import core.FileOperator
-from PyQt5 import QtCore, QtWidgets
-import core.StartPage
-import core.MainPage
+import component.StartPage
+import component.MainPage
 
 class Controller():
 
     curPath = os.getcwd()
-    libPathDefault = 'backups/Archives.db'
+    libPathDefault = 'core/Archives.db'
 
     def __init__(self):
         pass
@@ -20,7 +17,7 @@ class Controller():
             False
 
     def showStartPage(self):
-        self.startPage = core.StartPage.StartPage()
+        self.startPage = component.StartPage.StartPage()
         self.startPage.switchWindow.connect(self.showMainPage) #将switch_window这个信号和showMainPage这个函数连接
         self.startPage.show()
 
@@ -42,11 +39,11 @@ class Controller():
         # 若为空，则为初始化之后的情况
         if args:
             if args[0] == "":
-                self.mainPage = core.MainPage.MainPage()
+                self.mainPage = component.MainPage.MainPage()
                 self.mainPage.createDB()
                 self.mainPage.show()
         else:
-            self.mainPage = core.MainPage.MainPage()
+            self.mainPage = component.MainPage.MainPage()
             self.mainPage.readDB()
             self.mainPage.show()
 
