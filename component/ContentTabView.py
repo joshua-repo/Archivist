@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import QTabWidget, QWidget
 
 class contentTabView(QTabWidget):
-    def __init__(self):
+    def __init__(self, query):
         super().__init__()
-        self.initUI()
+        self.initUI(query)
 
-    def initUI(self):
+    def initUI(self, query):
         self.picTab = QWidget()
         self.musicTab = QWidget()
         self.pdfTab = QWidget()
