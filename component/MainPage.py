@@ -46,7 +46,7 @@ class MainPage(QMainWindow):
         addNewType = QAction('Add a new file type', self)
 
         searchFile = QAction('Search File', self)
-        searchFile.triggered.connect(self.searchPage)
+        searchFile.triggered.connect(self.toSearchPage)
 
         importLib = QAction('Import the library', self)
         exportLib = QAction('Export the library', self)
@@ -199,7 +199,7 @@ class MainPage(QMainWindow):
         #当用户需要从外部导入Archives.db时调用
         pass
 
-    def searchPage(self):
+    def toSearchPage(self):
         pass
 
     def center(self):
