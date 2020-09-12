@@ -110,9 +110,9 @@ class MainPage(QMainWindow):
 
         self.locationView = QListView()
         self.locationView.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.locationView.customContextMenuRequested(QPoint).connect(self.locationPopMenu)
+        self.locationView.doubleClicked.connect(self.removePath)
         self.filterView = QTableView()
-        self.mainView = component.ContentTabView.contentTabView()
+        self.mainView = component.ContentTabView.contentTabView(self.query)
         self.previewView = QTableView()
         self.metadateView = QListView()
 
@@ -145,22 +145,26 @@ class MainPage(QMainWindow):
         # 刷新location显示页面
         self.query.prepare("SELECT * FROM LIBINFO")
         self.query.exec()
-        self.model = QSqlQueryModel()
-        self.model.setQuery(self.query)
-        self.locationView.setModel(self.model)
+        model = QSqlQueryModel()
+        model.setQuery(self.query)
+        self.locationView.setModel(model)
+
+    def displayMetadata(self):
+        pass
 
     def addLocalPath(self):
         localPath = QFileDialog.getExistingDirectory(self, 'Select the directory', '/')
         self.query.exec("INSERT INTO LIBINFO (LOCATIONS) values ('{}')".format(localPath))
         self.displayLocation()
 
-    def locationPopMenu(self, point):
-        popMenu = QMenu()
-        removeAct = QAction('Remove', self)
-        #popMenu.addAction(removeAct)
-        if self.locationView.itemAt(point):
-            popMenu.addAction(removeAct)
-        popMenu.exec_(self.locationView.mapToGlobal(point))
+    def removePath(self, qModelIndex):
+        reply = QMessageBox.question(self, 'Remove Path', 'Do you wish to remove this path?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.query.exec("DELETE FROM LIBINFO WHERE LOCATIONS = '{}'".format(qModelIndex.data()))
+            self.displayLocation()
+        else:
+            pass
 
     def createDB(self):
         self.query.exec('''CREATE TABLE IF NOT EXISTS LIBINFO(
