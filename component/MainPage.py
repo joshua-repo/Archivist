@@ -130,6 +130,9 @@ class MainPage(QMainWindow):
         self.grid.addWidget(self.metadataLabel, 2, 2)
         self.grid.addWidget(self.metadateView, 3, 2)
 
+        #设置缩放因子，让中间页面更大一些
+        self.grid.setColumnStretch(1, 1)
+
         self.layoutWidget = QWidget()
         self.layoutWidget.setLayout(self.grid)
         self.setCentralWidget(self.layoutWidget)
@@ -161,7 +164,7 @@ class MainPage(QMainWindow):
         reply = QMessageBox.question(self, 'Remove Path', 'Do you wish to remove this path?',
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            self.query.exec("DELETE FROM LIBINFO WHERE LOCATIONS = '{}'".format(qModelIndex.data()))
+            self.query.exec("DELETE FROM LIBINFO WHERE LOCATIONS = ('{}')".format(qModelIndex.data()))
             self.displayLocation()
         else:
             pass
@@ -195,7 +198,7 @@ class MainPage(QMainWindow):
                 STYLE       TEXT    NOT NULL
             );''')
 
-    def readDB(self):
+    def readDB(self, libpath):
         #当用户需要从外部导入Archives.db时调用
         pass
 
