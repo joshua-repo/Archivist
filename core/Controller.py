@@ -44,7 +44,7 @@ class Controller():
                 self.mainPage.show()
         else:
             self.mainPage = component.MainPage.MainPage()
-            self.mainPage.readDB()
+            self.mainPage.readDB(args)
             self.mainPage.show()
 
     def __del__(self):
