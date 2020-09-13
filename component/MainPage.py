@@ -30,7 +30,7 @@ class MainPage(QMainWindow):
         fileMenu = menubar.addMenu('&File')
         editMenu = menubar.addMenu('&Edit')
         viewMenu = menubar.addMenu('&View')
-        tagsMenu = menubar.addMenu('&Tags')
+        #tagsMenu = menubar.addMenu('&Tags')
 
         #fileMenu
         addLibMenu = QMenu('Add a new path to library', self)
@@ -59,9 +59,17 @@ class MainPage(QMainWindow):
         fileMenu.addAction(exportLib)
 
         #editMenu
+        addNewTagMenu = QMenu('Add A New Tag', self)
+        addNewTag = QAction('Tag', self)
+        addNewRating = QAction('Rating', self)
+        addNewKeyword = QAction('Keyword', self)
+        addNewTagMenu.addAction(addNewTag)
+        addNewTagMenu.addAction(addNewRating)
+        addNewTagMenu.addAction(addNewKeyword)
         selectAll = QAction('Select All', self)
         preference = QAction('Preference', self)
 
+        editMenu.addMenu(addNewTagMenu)
         editMenu.addAction(selectAll)
         editMenu.addAction(preference)
 
@@ -94,13 +102,13 @@ class MainPage(QMainWindow):
         viewMenu.addMenu(sortMenu)
 
         #tagsMenu
-        addTags = QAction('New Label', self)
-        addRating = QAction('New Rating', self)
-        addKeyword = QAction('New Keyword', self)
-
-        tagsMenu.addAction(addTags)
-        tagsMenu.addAction(addRating)
-        tagsMenu.addAction(addKeyword)
+        # addTags = QAction('New Label', self)
+        # addRating = QAction('New Rating', self)
+        # addKeyword = QAction('New Keyword', self)
+        #
+        # tagsMenu.addAction(addTags)
+        # tagsMenu.addAction(addRating)
+        # tagsMenu.addAction(addKeyword)
 
     def centralWidgetGridLayout(self):
         self.locationLabel = QLabel('Locations')
@@ -109,7 +117,6 @@ class MainPage(QMainWindow):
         self.previewLabel = QLabel('Preview')
 
         self.locationView = QListView()
-        self.locationView.setContextMenuPolicy(Qt.CustomContextMenu)
         self.locationView.doubleClicked.connect(self.removePath)
         self.filterView = QTableView()
         self.mainView = component.ContentTabView.contentTabView(self.query)
