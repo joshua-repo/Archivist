@@ -1,0 +1,4 @@
+# ignore these files #
+/backups
+/tests
+/core/Archives.db
