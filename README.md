@@ -1,6 +1,6 @@
 # Archivist
 
-#### FOCUSE ON YOUR VALUEABLE DIGITAL ASSETS.
+#### CENTRALIZE YOUR DIGITAL ASSETS.
 
 Archivist is an easy tool to help access all your digital assets.
 
