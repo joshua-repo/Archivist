@@ -166,6 +166,7 @@ class MainPage(QMainWindow):
         localPath = QFileDialog.getExistingDirectory(self, 'Select the directory', '/')
         self.query.exec("INSERT INTO LIBINFO (LOCATIONS) values ('{}')".format(localPath))
         self.displayLocation()
+        
 
     def removePath(self, qModelIndex):
         reply = QMessageBox.question(self, 'Remove Path', 'Do you wish to remove this path?',
