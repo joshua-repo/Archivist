@@ -1,6 +1,0 @@
-# ignore these files #
-/.idea
-/.gitignore
-/backups
-/tests
-/core/Archives.db
