@@ -15,6 +15,13 @@ class MainPage(QMainWindow):
         self.initUI()
         self.displayLocation()
 
+    def initDB(self):
+        # 建立一个全局的连接
+        self.db = QSqlDatabase.addDatabase('QSQLITE')
+        self.db.setDatabaseName('./core/Archives.db')
+        self.db.open()
+        self.query = QSqlQuery()
+
     def initUI(self):
         self.menuBarInit()
         self.centralWidgetGridLayout()
@@ -24,13 +31,20 @@ class MainPage(QMainWindow):
         self.setWindowTitle('Archivist')
         self.setWindowIcon(QIcon('./resource/icon.png'))
 
+    def displayLocation(self):
+        # 刷新location显示页面
+        self.query.prepare("SELECT * FROM LIBINFO")
+        self.query.exec()
+        model = QSqlQueryModel()
+        model.setQuery(self.query)
+        self.locationView.setModel(model)
+
     def menuBarInit(self):
         menubar = self.menuBar()
 
         fileMenu = menubar.addMenu('&File')
         editMenu = menubar.addMenu('&Edit')
         viewMenu = menubar.addMenu('&View')
-        #tagsMenu = menubar.addMenu('&Tags')
 
         #fileMenu
         addLibMenu = QMenu('Add a new path to library', self)
@@ -43,10 +57,11 @@ class MainPage(QMainWindow):
         addLibMenu.addAction(addDisk)
 
         addFile = QAction('Add a new file to library', self)
+        addFile.triggered.connect(self.addLocalFile)
         addNewType = QAction('Add a new file type', self)
+        addNewType.triggered.connect(self.addNewFileType)
 
-        searchFile = QAction('Search File', self)
-        searchFile.triggered.connect(self.toSearchPage)
+        #searchFile = QAction('Search File', self)
 
         importLib = QAction('Import the library', self)
         exportLib = QAction('Export the library', self)
@@ -54,7 +69,7 @@ class MainPage(QMainWindow):
         fileMenu.addMenu(addLibMenu)
         fileMenu.addAction(addFile)
         fileMenu.addAction(addNewType)
-        fileMenu.addAction(searchFile)
+        #fileMenu.addAction(searchFile)
         fileMenu.addAction(importLib)
         fileMenu.addAction(exportLib)
 
@@ -101,15 +116,6 @@ class MainPage(QMainWindow):
         viewMenu.addMenu(iconSizeMenu)
         viewMenu.addMenu(sortMenu)
 
-        #tagsMenu
-        # addTags = QAction('New Label', self)
-        # addRating = QAction('New Rating', self)
-        # addKeyword = QAction('New Keyword', self)
-        #
-        # tagsMenu.addAction(addTags)
-        # tagsMenu.addAction(addRating)
-        # tagsMenu.addAction(addKeyword)
-
     def centralWidgetGridLayout(self):
         self.locationLabel = QLabel('Locations')
         self.filterLabel = QLabel('Filter')
@@ -144,29 +150,21 @@ class MainPage(QMainWindow):
         self.layoutWidget.setLayout(self.grid)
         self.setCentralWidget(self.layoutWidget)
 
-    def initDB(self):
-        # 建立一个全局的连接
-        self.db = QSqlDatabase.addDatabase('QSQLITE')
-        self.db.setDatabaseName('./core/Archives.db')
-        self.db.open()
-        self.query = QSqlQuery()
-
-    def displayLocation(self):
-        # 刷新location显示页面
-        self.query.prepare("SELECT * FROM LIBINFO")
-        self.query.exec()
-        model = QSqlQueryModel()
-        model.setQuery(self.query)
-        self.locationView.setModel(model)
-
     def displayMetadata(self):
         pass
 
     def addLocalPath(self):
         localPath = QFileDialog.getExistingDirectory(self, 'Select the directory', '/')
-        self.query.exec("INSERT INTO LIBINFO (LOCATIONS) values ('{}')".format(localPath))
+        self.query.exec("INSERT INTO HostedDirectory (LOCATIONS) VALUES ('{}')".format(localPath))
         self.displayLocation()
-        
+
+
+    def addLocalFile(self):
+        localFile = QFileDialog.getOpenFileName(self, 'Select the file', '/')
+        self.query.exec("INSERT INTO SingalFiles (LOCATIONS) VALUES ('{}')".format(localFile))
+
+    def addNewFileType(self):
+        pass
 
     def removePath(self, qModelIndex):
         reply = QMessageBox.question(self, 'Remove Path', 'Do you wish to remove this path?',
@@ -178,39 +176,44 @@ class MainPage(QMainWindow):
             pass
 
     def createDB(self):
-        self.query.exec('''CREATE TABLE IF NOT EXISTS LIBINFO(
-                LOCATIONS   TEXT    NOT NULL    UNIQUE 
+        self.query.exec('''CREATE TABLE IF NOT EXISTS HostedDirectory(
+                LOCATIONS   TEXT    NOT NULL    UNIQUE
             );''')
 
-        self.query.exec('''CREATE TABLE IF NOT EXISTS PICTURES(
+        self.query.exec('''CREATE TABLE IF NOT EXISTS SingalFiles(
+                LOCATIONS   TEXT    NOT NULL    UNIQUE 
+        );''')
+
+        self.query.exec('''CREATE TABLE IF NOT EXISTS Pictures(
                 PATH        TEXT    PRIMARY KEY NOT NULL UNIQUE ,
                 FILENAME    TEXT    NOT NULL ,
                 EXIF        TEXT    NOT NULL ,
-                USERTAGS    TEXT    NOT NULL
+                USERTAGS    TEXT    NOT NULL ,
+                RATING      TEXT    NOT NULL ,
+                KEYWORD     TEXT    NOT NULL 
             );''')
 
-        self.query.exec('''CREATE TABLE IF NOT EXISTS PDFDOC(
+        self.query.exec('''CREATE TABLE IF NOT EXISTS PDFDocs(
                 PATH        TEXT    PRIMARY KEY UNIQUE ,
                 FILENAME    TEXT    NOT NULL ,
                 ARRAGE      TEXT    NOT NULL ,
                 USERTAGS    TEXT    NOT NULL
             );''')
 
-        self.query.exec('''CREATE TABLE IF NOT EXISTS MUSIC(
+        self.query.exec('''CREATE TABLE IF NOT EXISTS Music(
                 PATH        TEXT    PRIMARY KEY UNIQUE ,
                 FILENAME    TEXT    NOT NULL ,
                 METADATA    TEXT    NOT NULL ,
                 THUMBNAIL   TEXT    NOT NULL ,
                 ALBUM       TEXT    NOT NULL ,
+                STYLE       TEXT    NOT NULL ,
                 USERTAGS    TEXT    NOT NULL ,
-                STYLE       TEXT    NOT NULL
+                RATING      TEXT    NOT NULL ,
+                KEYWORD     TEXT    NOT NULL 
             );''')
 
     def readDB(self, libpath):
         #当用户需要从外部导入Archives.db时调用
-        pass
-
-    def toSearchPage(self):
         pass
 
     def center(self):
