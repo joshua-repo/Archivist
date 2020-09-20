@@ -1,19 +1,20 @@
-from PyQt5 import QtCore
-from PyQt5.QtCore import QPoint, Qt
+import os
 
+import component.LocationView
 import component.ContentTabView
+import component.FilterTabView
+import tools.Utilities
+from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery, QSqlQueryModel
 from PyQt5.QtWidgets import QWidget, QMessageBox, QDesktopWidget, QMainWindow, QMenu, QFileDialog, QGridLayout, QAction, \
-    QTableView, QListView, QLabel, QLineEdit
+    QTableView, QListView, QLabel, QLineEdit, QListWidget
 from PyQt5.QtGui import QIcon, QCursor
-
 
 class MainPage(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initDB()
         self.initUI()
-        self.displayLocation()
 
     def initDB(self):
         # 建立一个全局的连接
@@ -26,18 +27,52 @@ class MainPage(QMainWindow):
         self.menuBarInit()
         self.centralWidgetGridLayout()
 
-        self.resize(1800, 950)
+        self.resize(1000, 650)
         self.center()
         self.setWindowTitle('Archivist')
         self.setWindowIcon(QIcon('./resource/icon.png'))
 
-    def displayLocation(self):
-        # 刷新location显示页面
-        self.query.prepare("SELECT * FROM LIBINFO")
-        self.query.exec()
-        model = QSqlQueryModel()
-        model.setQuery(self.query)
-        self.locationView.setModel(model)
+    def centralWidgetGridLayout(self):
+        self.locationLabel = QLabel('Locations')
+        self.filterLabel = QLabel('Filter')
+        self.metadataLabel = QLabel('Metadata')
+        self.previewLabel = QLabel('Preview')
+
+        #mainView
+        self.mainView = component.ContentTabView.contentTabView(self.query)
+
+        #locationView
+        self.locationView = component.LocationView.locationView(self.query, self.mainView)
+
+        #filterView
+        self.filterView = component.FilterTabView.filterTabView(self.query)
+
+        #previewView
+        self.previewView = QTableView()
+
+        #metadataView
+        self.metadataView = QListView()
+
+        self.grid = QGridLayout()
+        self.grid.addWidget(self.locationLabel, 0, 0)
+        self.grid.addWidget(self.locationView, 1, 0)
+        self.grid.addWidget(self.filterLabel, 2, 0)
+        self.grid.addWidget(self.filterView, 3, 0)
+        # addWidget(self, QWidget, row, column, rowSpan, columnSpan) 可以被这样重载
+        # rowSpan, columnSpan 代表跨行，跨列
+        # 参数-1代表直接将view延伸至底部
+        self.grid.addWidget(self.mainView, 0, 1, -1, 1)
+        self.grid.addWidget(self.previewLabel, 0, 2)
+        self.grid.addWidget(self.previewView, 1, 2, 1, 2)
+        self.grid.addWidget(self.metadataLabel, 2, 2)
+        self.grid.addWidget(self.metadataView, 3, 2)
+
+        #设置缩放因子，让中间页面更大一些
+        self.grid.setColumnStretch(1, 1)
+
+        self.layoutWidget = QWidget()
+        self.layoutWidget.setLayout(self.grid)
+        self.setCentralWidget(self.layoutWidget)
 
     def menuBarInit(self):
         menubar = self.menuBar()
@@ -50,7 +85,7 @@ class MainPage(QMainWindow):
         addLibMenu = QMenu('Add a new path to library', self)
         addLocal = QAction('Local Path', self)
         addLocal.triggered.connect(self.addLocalPath)
-        addURL = QAction('From Internet', self)
+        addURL = QAction('From Netdisk', self)
         addDisk = QAction('Whole Disk', self)
         addLibMenu.addAction(addLocal)
         addLibMenu.addAction(addURL)
@@ -61,15 +96,14 @@ class MainPage(QMainWindow):
         addNewType = QAction('Add a new file type', self)
         addNewType.triggered.connect(self.addNewFileType)
 
-        #searchFile = QAction('Search File', self)
-
         importLib = QAction('Import the library', self)
+        importLib.triggered.connect(self.importLibrary)
         exportLib = QAction('Export the library', self)
+        exportLib.triggered.connect(self.exportLibrary)
 
         fileMenu.addMenu(addLibMenu)
         fileMenu.addAction(addFile)
         fileMenu.addAction(addNewType)
-        #fileMenu.addAction(searchFile)
         fileMenu.addAction(importLib)
         fileMenu.addAction(exportLib)
 
@@ -116,100 +150,41 @@ class MainPage(QMainWindow):
         viewMenu.addMenu(iconSizeMenu)
         viewMenu.addMenu(sortMenu)
 
-    def centralWidgetGridLayout(self):
-        self.locationLabel = QLabel('Locations')
-        self.filterLabel = QLabel('Filter')
-        self.metadataLabel = QLabel('Metadata')
-        self.previewLabel = QLabel('Preview')
-
-        self.locationView = QListView()
-        self.locationView.doubleClicked.connect(self.removePath)
-        self.filterView = QTableView()
-        self.mainView = component.ContentTabView.contentTabView(self.query)
-        self.previewView = QTableView()
-        self.metadateView = QListView()
-
-        self.grid = QGridLayout()
-        self.grid.addWidget(self.locationLabel, 0, 0)
-        self.grid.addWidget(self.locationView, 1, 0)
-        self.grid.addWidget(self.filterLabel, 2, 0)
-        self.grid.addWidget(self.filterView, 3, 0)
-        # addWidget(self, QWidget, row, column, rowSpan, columnSpan) 可以被这样重载
-        # rowSpan, columnSpan 代表跨行，跨列
-        # 参数-1代表直接将view延伸至底部
-        self.grid.addWidget(self.mainView, 0, 1, -1, 1)
-        self.grid.addWidget(self.previewLabel, 0, 2)
-        self.grid.addWidget(self.previewView, 1, 2, 1, 2)
-        self.grid.addWidget(self.metadataLabel, 2, 2)
-        self.grid.addWidget(self.metadateView, 3, 2)
-
-        #设置缩放因子，让中间页面更大一些
-        self.grid.setColumnStretch(1, 1)
-
-        self.layoutWidget = QWidget()
-        self.layoutWidget.setLayout(self.grid)
-        self.setCentralWidget(self.layoutWidget)
-
-    def displayMetadata(self):
-        pass
-
     def addLocalPath(self):
-        localPath = QFileDialog.getExistingDirectory(self, 'Select the directory', '/')
-        self.query.exec("INSERT INTO HostedDirectory (LOCATIONS) VALUES ('{}')".format(localPath))
-        self.displayLocation()
-
+        self.locationView.addLocalPath()
 
     def addLocalFile(self):
-        localFile = QFileDialog.getOpenFileName(self, 'Select the file', '/')
-        self.query.exec("INSERT INTO SingalFiles (LOCATIONS) VALUES ('{}')".format(localFile))
+        self.locationView.addLocalFile()
 
     def addNewFileType(self):
         pass
 
-    def removePath(self, qModelIndex):
-        reply = QMessageBox.question(self, 'Remove Path', 'Do you wish to remove this path?',
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            self.query.exec("DELETE FROM LIBINFO WHERE LOCATIONS = ('{}')".format(qModelIndex.data()))
-            self.displayLocation()
-        else:
-            pass
+    def importLibrary(self):
+        pass
+
+    def exportLibrary(self):
+        pass
 
     def createDB(self):
-        self.query.exec('''CREATE TABLE IF NOT EXISTS HostedDirectory(
-                LOCATIONS   TEXT    NOT NULL    UNIQUE
-            );''')
-
-        self.query.exec('''CREATE TABLE IF NOT EXISTS SingalFiles(
-                LOCATIONS   TEXT    NOT NULL    UNIQUE 
+        self.query.exec('''CREATE TABLE IF NOT EXISTS LibraryInfo(
+            TAGS    TEXT    NOT NULL ,
+            RATING  TEXT    NOT NULL ,
+            KEYWORD TEXT    NOT NULL 
         );''')
 
-        self.query.exec('''CREATE TABLE IF NOT EXISTS Pictures(
-                PATH        TEXT    PRIMARY KEY NOT NULL UNIQUE ,
-                FILENAME    TEXT    NOT NULL ,
-                EXIF        TEXT    NOT NULL ,
-                USERTAGS    TEXT    NOT NULL ,
-                RATING      TEXT    NOT NULL ,
-                KEYWORD     TEXT    NOT NULL 
+        self.query.exec('''CREATE TABLE IF NOT EXISTS HostedDirectory(
+            LOCATION   TEXT    NOT NULL    UNIQUE
             );''')
 
-        self.query.exec('''CREATE TABLE IF NOT EXISTS PDFDocs(
-                PATH        TEXT    PRIMARY KEY UNIQUE ,
-                FILENAME    TEXT    NOT NULL ,
-                ARRAGE      TEXT    NOT NULL ,
-                USERTAGS    TEXT    NOT NULL
-            );''')
-
-        self.query.exec('''CREATE TABLE IF NOT EXISTS Music(
-                PATH        TEXT    PRIMARY KEY UNIQUE ,
-                FILENAME    TEXT    NOT NULL ,
-                METADATA    TEXT    NOT NULL ,
-                THUMBNAIL   TEXT    NOT NULL ,
-                ALBUM       TEXT    NOT NULL ,
-                STYLE       TEXT    NOT NULL ,
-                USERTAGS    TEXT    NOT NULL ,
-                RATING      TEXT    NOT NULL ,
-                KEYWORD     TEXT    NOT NULL 
+        self.query.exec('''CREATE TABLE IF NOT EXISTS FileLibrary(
+            PATH        TEXT    PRIMARY KEY NOT NULL UNIQUE ,
+            FILENAME    TEXT    NOT NULL ,
+            SUFFIX      TEXT    NOT NULL ,
+            ROOT        TEXT    NOT NULL ,
+            FILETYPE    TEXT    NOT NULL ,
+            USERTAGS    TEXT    NOT NULL ,
+            RATING      TEXT    NOT NULL ,
+            KEYWORD     TEXT    NOT NULL 
             );''')
 
     def readDB(self, libpath):
