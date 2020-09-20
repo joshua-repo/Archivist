@@ -16,22 +16,21 @@ def ReadExif(path, filename):
     f.close()
     return tags
 
-def SearchSelectedPath(path,picFiles = [], musicFiles = [], docFiles = []):
+def SearchSelectedPath(path, query):
+    pictureSuffix = ['.NEF', '.jpg']
     for fileName in os.listdir(path):
         suffixName = os.path.splitext(fileName)[-1]
         # 搜索图片
-        # 读取EXIF信息并生成缩略图保存在backups/thumbnail
-        if suffixName in picFiles:
-            print("Found Picture {}".format(fileName))
-        # 搜索音乐
-        if suffixName in musicFiles:
-            print("Found Music {}".format(fileName))
-        if suffixName in docFiles:
-            print("Found Document {}".format(fileName))
-        # if suffixName in costumeFiles:
-        #     print("Found costume type file {}".format(fileName))
+        if suffixName in pictureSuffix:
+            query.exec("INSERT INTO Pictures"
+                       "(PATH, FILENAME, USERTAGS, RATING, KEYWORD)"
+                       "VALUES ('{}', '{}', '{}', '{}', '{}')".format(
+                        path + '/' + fileName, fileName, "", "", "")
+            )
         if os.path.isdir(path + '/' + fileName):
-            SearchSelectedPath(path + '/' + fileName)
+            SearchSelectedPath(path + '/' + fileName, query) #注意这边还有一个query这个参数，有子文件递归会出错
+
+
 
 #传入一个网址，来获得它的服务器时间
 def getWebServerTime(host):
