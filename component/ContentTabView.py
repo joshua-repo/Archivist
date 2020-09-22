@@ -17,7 +17,7 @@ class contentTabView(QTabWidget):
         self.allFileTab.customContextMenuRequested[QPoint].connect(self.popMenu)
 
         self.pictureTab = QListView()
-        self.updatePicturePage()
+#        self.updatePicturePage()
         self.pictureTab.setContextMenuPolicy(3)
         self.pictureTab.customContextMenuRequested[QPoint].connect(self.popMenu)
 
@@ -25,24 +25,26 @@ class contentTabView(QTabWidget):
         self.addTab(self.pictureTab, "Picture")
 
     def updateAllPage(self):
-        self.query.exec("SELECT FILENAME FROM FileLibrary")
+        self.query.exec("SELECT FILENAME FROM FileLibrary WHERE SUFFIX != ('{}')".format(""))
+        #如果是目录，会被排除掉
         model = QSqlQueryModel()
         model.setQuery(self.query)
         self.allFileTab.setModel(model)
 
-    def updatePicturePage(self):
-        self.query.exec("SELECT FILENAME FROM FileLibrary WHERE FILETYPE = PICTURE")
-        model = QSqlQueryModel()
-        model.setQuery(self.query)
-        self.pictureTab.setModel(model)
+    # def updatePicturePage(self):
+    #     self.query.exec("SELECT FILENAME FROM FileLibrary WHERE FILETYPE = PICTURE")
+    #     model = QSqlQueryModel()
+    #     model.setQuery(self.query)
+    #     self.pictureTab.setModel(model)
 
     def popMenu(self, point):
         qModelIndex = self.allFileTab.indexAt(point)
         item = qModelIndex.data()
         print(item)
         popMenu = QMenu()
-        popMenu.addAction("Open file")
-        popMenu.addAction("Open the path")
+        popMenu.addAction("Open File")
+        popMenu.addAction("Open the Path")
+        popMenu.addAction("Remove the File")
         setTag = QMenu("Tags")
         setRating = QMenu("Rating")
         setRating.addAction("1 star")

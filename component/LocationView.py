@@ -33,27 +33,33 @@ class locationView(QTabWidget):
 
     def addLocalPath(self):
         localPath = QFileDialog.getExistingDirectory(self, 'Select the Directory', '/')
-        self.query.exec("INSERT INTO HostedDirectory (LOCATION) VALUES ('{}')".format(localPath))
-        core.FileOperator.searchPath(localPath, self.query)
-        self.updateLocationView()
-        self.linkToMainView.updateAllPage()
+        if localPath == '':
+            pass
+        else:
+            self.query.exec("INSERT INTO HostedDirectory (LOCATION) VALUES ('{}')".format(localPath))
+            core.FileOperator.searchPath(localPath, self.query)
+            self.updateLocationView()
+            self.linkToMainView.updateAllPage()
 
     def addLocalFile(self):
         localFile = QFileDialog.getOpenFileName(self, 'Select the File', '/')
-        PATH = localFile[0]
-        FILENAME = os.path.split(localFile[0])[-1]
-        SUFFIX = os.path.splitext(localFile[0])[-1]
-        ROOT = ""
-        FILETYPE = ""
-        USERTAGS = ""
-        RATING = ""
-        KEYWORD = ""
-        self.query.exec("INSERT INTO FileLibrary ("
-                        "PATH, FILENAME, SUFFIX, ROOT, FILETYPE, USERTAGS, RATING, KEYWORD"
-                        ") VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
-            PATH, FILENAME, SUFFIX, ROOT, FILETYPE, USERTAGS, RATING, KEYWORD
-        ))
-        self.linkToMainView.updateAllPage()
+        if localFile == '':
+            pass
+        else:
+            PATH = localFile[0]
+            FILENAME = os.path.split(localFile[0])[-1]
+            SUFFIX = os.path.splitext(localFile[0])[-1]
+            ROOT = ""
+            FILETYPE = ""
+            USERTAGS = ""
+            RATING = ""
+            KEYWORD = ""
+            self.query.exec("INSERT INTO FileLibrary ("
+                            "PATH, FILENAME, SUFFIX, ROOT, FILETYPE, USERTAGS, RATING, KEYWORD"
+                            ") VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
+                PATH, FILENAME, SUFFIX, ROOT, FILETYPE, USERTAGS, RATING, KEYWORD
+            ))
+            self.linkToMainView.updateAllPage()
 
     def localLcationPopMenu(self, point):
         qModelIndex = self.localLocation.indexAt(point)

@@ -108,17 +108,13 @@ class MainPage(QMainWindow):
         fileMenu.addAction(exportLib)
 
         #editMenu
-        addNewTagMenu = QMenu('Add A New Tag', self)
-        addNewTag = QAction('Tag', self)
-        addNewRating = QAction('Rating', self)
-        addNewKeyword = QAction('Keyword', self)
-        addNewTagMenu.addAction(addNewTag)
-        addNewTagMenu.addAction(addNewRating)
-        addNewTagMenu.addAction(addNewKeyword)
+        addNewTag = QAction('Add a Tag', self)
+        addNewKeword = QAction("Add a Keyword", self)
         selectAll = QAction('Select All', self)
         preference = QAction('Preference', self)
 
-        editMenu.addMenu(addNewTagMenu)
+        editMenu.addAction(addNewTag)
+        editMenu.addAction(addNewKeword)
         editMenu.addAction(selectAll)
         editMenu.addAction(preference)
 
@@ -171,6 +167,8 @@ class MainPage(QMainWindow):
             RATING  TEXT    NOT NULL ,
             KEYWORD TEXT    NOT NULL 
         );''')
+
+
 
         self.query.exec('''CREATE TABLE IF NOT EXISTS HostedDirectory(
             LOCATION   TEXT    NOT NULL    UNIQUE
