@@ -26,7 +26,7 @@ def searchPath(path, query):
             query.exec("INSERT INTO HostedDirectory (LOCATION) VALUES ('{}')".format(path + '/' + fileName))
             searchPath(path + '/' + fileName, query)
 
-def sortFiles(path):
+def sortFiles(query):
     pass
 
 def ReadExif(path, filename):
