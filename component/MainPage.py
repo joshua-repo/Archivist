@@ -1,9 +1,9 @@
 import os
 
 import component.LocationView
-import component.ContentTabView
-import component.FilterTabView
-import tools.Utilities
+import component.ContentView
+import component.FilterView
+import component.PropertyView
 from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery, QSqlQueryModel
 from PyQt5.QtWidgets import QWidget, QMessageBox, QDesktopWidget, QMainWindow, QMenu, QFileDialog, QGridLayout, QAction, \
@@ -22,6 +22,8 @@ class MainPage(QMainWindow):
         self.db.setDatabaseName('./core/Archives.db')
         self.db.open()
         self.query = QSqlQuery()
+        self.TAGS = ['Black', 'Blue', 'Brown', 'Green', 'Red', 'Yellow']
+        self.KEYWORDS = ['To-Do', 'Favorite', 'Important', 'Wasted']
 
     def initUI(self):
         self.menuBarInit()
@@ -31,49 +33,7 @@ class MainPage(QMainWindow):
         self.center()
         self.setWindowTitle('Archivist')
         self.setWindowIcon(QIcon('./resource/icon.png'))
-
-    def centralWidgetGridLayout(self):
-        self.locationLabel = QLabel('Locations')
-        self.filterLabel = QLabel('Filter')
-        self.metadataLabel = QLabel('Metadata')
-        self.previewLabel = QLabel('Preview')
-
-        #mainView
-        self.mainView = component.ContentTabView.contentTabView(self.query)
-
-        #locationView
-        self.locationView = component.LocationView.locationView(self.query, self.mainView)
-
-        #filterView
-        self.filterView = component.FilterTabView.filterTabView(self.query)
-
-        #previewView
-        self.previewView = QTableView()
-
-        #metadataView
-        self.metadataView = QListView()
-
-        self.grid = QGridLayout()
-        self.grid.addWidget(self.locationLabel, 0, 0)
-        self.grid.addWidget(self.locationView, 1, 0)
-        self.grid.addWidget(self.filterLabel, 2, 0)
-        self.grid.addWidget(self.filterView, 3, 0)
-        # addWidget(self, QWidget, row, column, rowSpan, columnSpan) 可以被这样重载
-        # rowSpan, columnSpan 代表跨行，跨列
-        # 参数-1代表直接将view延伸至底部
-        self.grid.addWidget(self.mainView, 0, 1, -1, 1)
-        self.grid.addWidget(self.previewLabel, 0, 2)
-        self.grid.addWidget(self.previewView, 1, 2, 1, 2)
-        self.grid.addWidget(self.metadataLabel, 2, 2)
-        self.grid.addWidget(self.metadataView, 3, 2)
-
-        #设置缩放因子，让中间页面更大一些
-        self.grid.setColumnStretch(1, 1)
-
-        self.layoutWidget = QWidget()
-        self.layoutWidget.setLayout(self.grid)
-        self.setCentralWidget(self.layoutWidget)
-
+        
     def menuBarInit(self):
         menubar = self.menuBar()
 
@@ -110,6 +70,7 @@ class MainPage(QMainWindow):
         #editMenu
         addNewTag = QAction('Add a Tag', self)
         addNewKeword = QAction("Add a Keyword", self)
+        addNewTab = QAction("Add a New Tab", self)
         selectAll = QAction('Select All', self)
         preference = QAction('Preference', self)
 
@@ -145,6 +106,43 @@ class MainPage(QMainWindow):
 
         viewMenu.addMenu(iconSizeMenu)
         viewMenu.addMenu(sortMenu)
+        
+    def centralWidgetGridLayout(self):
+        #contentView
+        self.contentView = component.ContentView.contentView(self.query, self.TAGS, self.KEYWORDS)
+
+        #locationView
+        self.locationView = component.LocationView.locationView(self.query, self.contentView)
+
+        #filterView
+        self.filterView = component.FilterView.filterTabView(self.query, self.contentView, self.TAGS, self.KEYWORDS)
+
+        #previewView
+        self.previewView = QTableView()
+
+        #infomationView
+        self.propertyView = component.PropertyView.propertyView(self.query)
+
+        self.contentView.getPreviewView(self.previewView)
+        self.contentView.getPropertyView(self.propertyView)
+        grid = QGridLayout()
+        grid.addWidget(self.locationView, 0, 0)
+        grid.addWidget(self.filterView, 1, 0)
+        # addWidget(self, QWidget, row, column, rowSpan, columnSpan) 可以被这样重载
+        # rowSpan, columnSpan 代表跨行，跨列
+        # 参数-1代表直接将view延伸至底部
+        grid.addWidget(self.contentView, 0, 1, -1, 1)
+        grid.addWidget(self.previewView, 0, 2)
+        grid.addWidget(self.propertyView, 1, 2)
+
+        #设置缩放因子，让中间页面更大一些
+        grid.setColumnStretch(1, 1)
+
+        layoutWidget = QWidget()
+        layoutWidget.setLayout(grid)
+        self.setCentralWidget(layoutWidget)
+
+
 
     def addLocalPath(self):
         self.locationView.addLocalPath()
@@ -162,16 +160,22 @@ class MainPage(QMainWindow):
         pass
 
     def createDB(self):
-        self.query.exec('''CREATE TABLE IF NOT EXISTS LibraryInfo(
-            TAGS    TEXT    NOT NULL ,
-            RATING  TEXT    NOT NULL ,
-            KEYWORD TEXT    NOT NULL 
+        self.query.exec('''CREATE TABLE IF NOT EXISTS TagInfo(
+            TAG     TEXT    PRIMARY KEY NOT NULL UNIQUE 
         );''')
 
+        self.query.exec('''CREATE TABLE IF NOT EXISTS KeywordInfo(
+            KEYWORDS TEXT    PRIMARY KEY NOT NULL UNIQUE 
+        );''')
 
+        for word in self.TAGS:
+            self.query.exec("INSERT INTO TagInfo VALUES ('{}')".format(word))
+
+        for word in self.KEYWORDS:
+            self.query.exec("INSERT INTO KeywordInfo VALUES ('{}')".format(word))
 
         self.query.exec('''CREATE TABLE IF NOT EXISTS HostedDirectory(
-            LOCATION   TEXT    NOT NULL    UNIQUE
+            LOCATION    TEXT    NOT NULL    UNIQUE
             );''')
 
         self.query.exec('''CREATE TABLE IF NOT EXISTS FileLibrary(
@@ -182,7 +186,7 @@ class MainPage(QMainWindow):
             FILETYPE    TEXT    NOT NULL ,
             USERTAGS    TEXT    NOT NULL ,
             RATING      TEXT    NOT NULL ,
-            KEYWORD     TEXT    NOT NULL 
+            KEYWORDS     TEXT    NOT NULL 
             );''')
 
     def readDB(self, libpath):

@@ -1,35 +1,35 @@
 import os
 
 import core.FileOperator
-import component.ContentTabView
+import component.ContentView
 from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QCursor
 from PyQt5.QtSql import QSqlQueryModel
 from PyQt5.QtWidgets import QListView, QFileDialog, QTabWidget, QAbstractItemView, QMenu, QMessageBox, QAction
 
 class locationView(QTabWidget):
-    def __init__(self, query, linkToMainView):
+    def __init__(self, query, contentView):
         super().__init__()
         self.query = query
-        self.linkToMainView = linkToMainView
+        self.contentView = contentView
         self.initUI()
 
     def initUI(self):
-        self.localLocation = QListView()
+        self.localLocationTab = QListView()
         self.updateLocationView()
-        self.localLocation.setContextMenuPolicy(3)
-        self.localLocation.customContextMenuRequested[QPoint].connect(self.localLcationPopMenu)
+        self.localLocationTab.setContextMenuPolicy(3)
+        self.localLocationTab.customContextMenuRequested[QPoint].connect(self.localLcationPopMenu)
 
         self.netLocation = QListView()
 
-        self.addTab(self.localLocation, "Local")
+        self.addTab(self.localLocationTab, "Local")
         self.addTab(self.netLocation, "Net")
 
     def updateLocationView(self):
         self.query.exec("SELECT * FROM HostedDirectory")
         model = QSqlQueryModel()
         model.setQuery(self.query)
-        self.localLocation.setModel(model)
+        self.localLocationTab.setModel(model)
 
     def addLocalPath(self):
         localPath = QFileDialog.getExistingDirectory(self, 'Select the Directory', '/')
@@ -39,7 +39,7 @@ class locationView(QTabWidget):
             self.query.exec("INSERT INTO HostedDirectory (LOCATION) VALUES ('{}')".format(localPath))
             core.FileOperator.searchPath(localPath, self.query)
             self.updateLocationView()
-            self.linkToMainView.updateAllPage()
+            self.contentView.updateAllPage()
 
     def addLocalFile(self):
         localFile = QFileDialog.getOpenFileName(self, 'Select the File', '/')
@@ -55,14 +55,14 @@ class locationView(QTabWidget):
             RATING = ""
             KEYWORD = ""
             self.query.exec("INSERT INTO FileLibrary ("
-                            "PATH, FILENAME, SUFFIX, ROOT, FILETYPE, USERTAGS, RATING, KEYWORD"
+                            "PATH, FILENAME, SUFFIX, ROOT, FILETYPE, USERTAGS, RATING, KEYWORDS"
                             ") VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
                 PATH, FILENAME, SUFFIX, ROOT, FILETYPE, USERTAGS, RATING, KEYWORD
             ))
-            self.linkToMainView.updateAllPage()
+            self.contentView.updateAllPage()
 
     def localLcationPopMenu(self, point):
-        qModelIndex = self.localLocation.indexAt(point)
+        qModelIndex = self.localLocationTab.indexAt(point)
         self.localLacationitem = qModelIndex.data()
         print(self.localLacationitem)
         if self.localLacationitem == None:
@@ -82,6 +82,6 @@ class locationView(QTabWidget):
             self.query.exec("DELETE FROM HostedDirectory WHERE LOCATION = ('{}')".format(self.localLacationitem))
             self.updateLocationView()
             self.query.exec("DELETE FROM FileLibrary WHERE ROOT = ('{}')".format(self.localLacationitem))
-            self.linkToMainView.updateAllPage()
+            self.contentView.updateAllPage()
         if reply == QMessageBox.No:
             pass
