@@ -2,7 +2,7 @@
 
 #### CENTRALIZE YOUR DIGITAL ASSETS.
 
-Archivist is an easy tool to help access all your digital assets.
+Archivist is an easy tool to help organizing all your digital assets.
 
 The software is under MIT license.
 
@@ -46,10 +46,12 @@ python Archivist.py
 1. Archivist.py is the entrance of the software, the object controller 
 will be created here.
 
-## 6.TODO
-- [x] Database initialization
-- [x] Mainpage UI
-- [ ] Database
-- [ ] Network storage
+2./core holds Archivies.db by default. If Archivies.db is imported from
+other place, then it will be here and replace the older one.
 
+## 6.Dev Log
+09/28/20 Basic feature is nearly done. Right now, each file can hold 
+a tag, a rating and a keyword seperately.
 
+## 7. TO-DO
+-[ ] For each file, can hold more than just one tag and one keyword.
