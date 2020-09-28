@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QTabWidget, QTreeWidget, QTreeWidgetItem, QListView, QTreeView, QWidget, QGridLayout, \
     QScrollArea, QVBoxLayout
 
-
 class propertyView(QWidget):
     def __init__(self, query):
         super().__init__()
