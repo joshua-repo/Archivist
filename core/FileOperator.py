@@ -17,7 +17,7 @@ def searchPath(path, query):
         RATING = ""
         KEYWORD = ""
         query.exec("INSERT INTO FileLibrary ("
-                   "PATH, FILENAME, SUFFIX, ROOT, FILETYPE, USERTAGS, RATING, KEYWORD"
+                   "PATH, FILENAME, SUFFIX, ROOT, FILETYPE, USERTAGS, RATING, KEYWORDS"
                    ") VALUES ('{}', '{}', '{}', '{}','{}', '{}', '{}', '{}')".format(
             PATH, FILENAME, SUFFIX, ROOT, FILETYPE, USERTAG, RATING, KEYWORD
         ))

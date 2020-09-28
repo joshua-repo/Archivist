@@ -44,6 +44,7 @@ class Controller():
                 self.mainPage.show()
         else:
             self.mainPage = component.MainPage.MainPage()
+            self.mainPage.createDB()
             self.mainPage.readDB(args)
             self.mainPage.show()
 
