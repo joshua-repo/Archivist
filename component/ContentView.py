@@ -1,7 +1,9 @@
+import core.FileOperator
 from PyQt5.QtCore import QPoint
-from PyQt5.QtGui import QCursor
+from PyQt5.QtGui import QCursor, QIcon
 from PyQt5.QtSql import QSqlQueryModel
-from PyQt5.QtWidgets import QTabWidget, QWidget, QListWidget, QListView, QMenu, QAbstractItemView
+from PyQt5.QtWidgets import QTabWidget, QWidget, QListWidget, QListView, QMenu, QAbstractItemView, QAction
+
 
 class contentView(QTabWidget):
     def __init__(self, query, TAGS, KEYWORDS):
@@ -25,12 +27,18 @@ class contentView(QTabWidget):
         self.addTab(self.allFileTab, "All")
         self.addTab(self.pictureTab, "Picture")
 
-    def updateAllPage(self):
-        self.query.exec("SELECT FILENAME FROM FileLibrary WHERE SUFFIX != ('{}')".format(""))
-        #如果是目录，会被排除掉
-        model = QSqlQueryModel()
-        model.setQuery(self.query)
-        self.allFileTab.setModel(model)
+    def updateAllPage(self, *args):
+        if args == ([], [], []) or args == ():
+            self.query.exec("SELECT FILENAME FROM FileLibrary WHERE SUFFIX != ('{}')".format(""))
+            #如果是目录，会被排除掉
+            model = QSqlQueryModel()
+            model.setQuery(self.query)
+            self.allFileTab.setModel(model)
+        else:
+            core.FileOperator.unionQuery(self.query, args[0], args[1], args[2])
+            model = QSqlQueryModel()
+            model.setQuery(self.query)
+            self.allFileTab.setModel(model)
 
     def popMenu(self, point):
         qModelIndex = self.allFileTab.indexAt(point)
@@ -41,6 +49,7 @@ class contentView(QTabWidget):
         popMenu.addAction("Remove the File").triggered.connect(self.removeFile)
 
         setTag = QMenu("Tags")
+
         for tag in self.TAGS:
             setTag.addAction(tag).triggered.connect(self.setTag)
 
@@ -67,17 +76,20 @@ class contentView(QTabWidget):
     def setTag(self):
         tag = self.sender().text()
         self.query.exec("UPDATE FileLibrary SET USERTAGS = '{}' WHERE FILENAME == '{}'".format(tag, self.item))
+        self.propertyView.showMetadata(self.item)
 
     def setRating(self):
         rating = self.sender().text()
         self.query.exec("UPDATE FileLibrary SET RATING = '{}' WHERE FILENAME == '{}'".format(rating, self.item))
+        self.propertyView.showMetadata(self.item)
 
     def setKeyword(self):
         keyword = self.sender().text()
         self.query.exec("UPDATE FileLibrary SET KEYWORDS = '{}' WHERE FILENAME == '{}'".format(keyword, self.item))
+        self.propertyView.showMetadata(self.item)
 
     def getPreviewView(self, previewView):
-       self.previewView = previewView
+        self.previewView = previewView
 
     def getPropertyView(self, propertyView):
         self.propertyView = propertyView

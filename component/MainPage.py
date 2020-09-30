@@ -125,6 +125,7 @@ class MainPage(QMainWindow):
 
         self.contentView.getPreviewView(self.previewView)
         self.contentView.getPropertyView(self.propertyView)
+
         grid = QGridLayout()
         grid.addWidget(self.locationView, 0, 0)
         grid.addWidget(self.filterView, 1, 0)

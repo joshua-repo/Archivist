@@ -64,7 +64,6 @@ class locationView(QTabWidget):
     def localLcationPopMenu(self, point):
         qModelIndex = self.localLocationTab.indexAt(point)
         self.localLacationitem = qModelIndex.data()
-        print(self.localLacationitem)
         if self.localLacationitem == None:
             popMenu = QMenu()
             popMenu.addAction("Add a Local Path").triggered.connect(self.addLocalPath)

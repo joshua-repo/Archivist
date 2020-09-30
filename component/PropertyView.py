@@ -1,3 +1,4 @@
+import core.FileOperator
 from PyQt5.QtWidgets import QTabWidget, QTreeWidget, QTreeWidgetItem, QListView, QTreeView, QWidget, QGridLayout, \
     QScrollArea, QVBoxLayout
 
@@ -37,3 +38,8 @@ class propertyView(QWidget):
             self.tagsCategory.setText(1, self.query.value(0))
             self.ratingCategory.setText(1, self.query.value(1))
             self.keywordCategory.setText(1, self.query.value(2))
+
+        self.query.exec("SELECT PATH FROM FileLibrary WHERE FILENAME == '{}'".format(item))
+        while self.query.next():
+            EXIF = core.FileOperator.ReadExif(self.query.value(0))
+            print(EXIF)
