@@ -4,7 +4,7 @@
 
 Archivist is an easy tool to help organizing all your digital assets.
 
-The software is under MIT license.
+According to the license of PyQt5, this software is under license of GPL.
 
 This project is W.I.P, and has a long way to go.
 
@@ -16,9 +16,7 @@ Archivist aims to be a tool which helps to manage all the valuable
 files simply.
 
 ## 2. Environment
-- Windows 10
 - Anaconda
-- Python3.8
 - PyQt5
 
 ## 3.Dependency
