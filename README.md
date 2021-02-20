@@ -16,6 +16,7 @@ Archivist aims to be a tool which helps to manage all the valuable
 files simply.
 
 ## 2. Environment
+- Windows/MacOS(PyQt5 is designed as cross-platform)
 - Anaconda
 - PyQt5
 
