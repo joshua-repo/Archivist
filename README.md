@@ -60,5 +60,7 @@ keyword at the same time.
 
 ## 7. TO-DO
 -[ ] For each file, can hold more than just one tag and one keyword.
+
 -[ ] Preview(thumbnail) for the file.
+
 -[ ] Attribute for the file(Espacially pictures)
