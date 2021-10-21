@@ -34,7 +34,7 @@ If the network is fine then it should be done within a few minutes.
 ## 4. Usage
 - Clone the repository
 ```shell script
-git clone https://github.com/Oderschvank/Archivist.git
+https://github.com/Joshua-Meakin/Archivist
 ```
 then just run Archivist.py directly
 ```shell script
